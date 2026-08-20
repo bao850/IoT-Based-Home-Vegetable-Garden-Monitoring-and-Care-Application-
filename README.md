@@ -58,4 +58,19 @@ Figure 1.9 illustrates the image library management interface of the system on t
   Image 1.10. Vegetable garden images after being cropped and synchronized with the web interface.
 </p>
 Figure 1.10 illustrates the web interface displaying images of the vegetable garden after being cropped by the system according to each growing zone. The images captured by the camera are initially separated into appropriate sections for each garden zone and then synchronized with the web interface, allowing users to clearly and visually monitor the condition of each vegetable growing zone.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/b93fa62f-9199-494a-9e1e-c4a69b91d902" />
+    <br>
+  Image 1.11. Vegetable Garden Login Interface
+</p>
+After successfully logging in, users are redirected to the system’s home page, which provides an overview of the garden information, including water level status, garden condition, the number of active devices, and environmental parameters for each zone.
+<p align="center">
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/f5874f52-4baa-4c02-805c-f6f568b4257f" />
+    <br>
+  Image 1.12. Vegetable Garden Home Page Interface
+</p>
+Figure 1.12 illustrates the home page interface of the vegetable garden management system after the user successfully logs in. On the left side of the interface, there is a navigation menu that allows users to quickly access the system’s main functions, such as the home page, device control, data history, user guide, and detailed management of each garden zone.
 
+At the top of the interface, the system displays a notification bell icon used to send and display alerts when an abnormal condition is detected in the vegetable garden or its devices. These alerts help users promptly identify the system status and take appropriate actions.
+
+The central content area provides an overview of the system’s operating status, including the water level in the tank, garden condition, number of active devices, and environmental parameters of each vegetable growing zone, such as temperature, air humidity, soil moisture, and light intensity. Through this interface, users can easily monitor, compare, and manage the operation of the entire vegetable garden system.
