@@ -35,3 +35,20 @@ The figure shows the arrangement of the sensor and electronic devices viewed fro
     <br>
   Image 1.6. The 20×4 LCD displays environmental parameters and system status.
 </p>
+<p align="center">
+ <img width="400"  alt="image" src="https://github.com/user-attachments/assets/64b4f6b8-ac6a-458d-a0f0-ee923733d3aa" />
+    <br>
+  Image 1.7. The devices are turned on.
+</p>
+<p align="center">
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/d2968aa5-e377-49c8-a464-f364a54b3ef8" />
+    <br>
+  Image 1.8. Turn devices on/off via the web interface.
+</p>
+Figure 1.8 illustrates the system’s device control interface on the web platform. Through this interface, users can turn the garden devices on or off, including lighting, ventilation fans, the water pump, and the misting system. The status of each device is displayed visually on the interface, allowing users to easily monitor and control the system’s operation. In addition to manual control, the interface also supports automatic operation, allowing the devices to operate based on predefined environmental conditions, thereby improving the flexibility and efficiency of the vegetable garden management process.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/8a0fdca8-70ec-479c-9b99-757c55e882d6" />
+    <br>
+  Image 1.9. Image library for storing vegetable garden images on Cloudinary.
+</p>
+Figure 1.9 illustrates the image library management interface of the system on the Cloudinary platform. Here, images captured by the camera are stored and categorized according to each vegetable growing zone. After being cropped appropriately for each zone, the images are synchronized with the Firebase database and displayed on the web interface, allowing users to monitor and track the condition of the vegetable garden over time.
