@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Garden IoT</title>
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+ 
+
+
+  <link rel="stylesheet" href="datn.css"/>
+
+  <style>body{display:none;}</style>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!sessionStorage.getItem("smartgarden_login")) {
+        window.location.replace("index.html");
+      } else document.body.style.display = "block";
+    });
+  </script>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<!-- ================= SIDEBAR ================= -->
+<aside id="sidebar">
+  <div class="sidebar-title">
+      <span class="material-icons-outlined">home</span>
+      Giao diện quản lý vườn rau
+  </div>
+
+  <ul class="sidebar-list">
+
+    <!-- Trang chủ -->
+    <li class="sidebar-list-item active">
+      <a href="./datn.html">
+        <span class="material-icons-outlined">dashboard</span>
+        Trang chủ
+      </a>
+    </li>
+
+    <!-- Điều khiển (Dropdown) -->
+    <li class="sidebar-list-item dropdown">
+        <input type="checkbox" id="nav_control">
+        <label for="nav_control" class="dropdown-label">
+            <span class="material-icons-outlined">settings</span>
+            Điều khiển
+        </label>
+
+        <ul class="submenu">
+            <li><a href="./vuon1.html">🌿 Vườn 1</a></li>
+            <li><a href="./vuon2.html">🍀 Vườn 2</a></li>
+            <li><a href="./vuon3.html">🌱 Vườn 3</a></li>
+        </ul>
+    </li>
+
+    <!-- LS -->
+    <li class="sidebar-list-item">
+      <a href="./his.html">
+        <span class="material-icons-outlined">history</span>
+        Lịch sử
+      </a>
+    </li>
+    <!-- Huong dan -->
+    <li class="sidebar-list-item">
+      <a href="./guide.html">
+        <span class="material-icons-outlined">help</span>
+        Hướng dẫn
+      </a>
+    </li>
+  </ul>
+</aside>
+
+
+
+
+
+<!-- ============= MAIN AREA ============= -->
+<div class="main">
+
+  <!-- HEADER CHỈ CHO CONTENT -->
+<header class="nav">
+
+  <div class="nav-left"></div> <!-- để trống hoặc đặt menu -->
+
+  <div class="nav-center">
+      <img src="./img/logoute.png" alt="">
+      <h2 class="nav-title">
+        ĐỒ ÁN TỐT NGHIỆP: ỨNG DỤNG IOTS TRONG VIỆC GIÁM SÁT VÀ CHĂM SÓC VƯỜN RAU TẠI NHÀ
+      </h2>
+  </div>
+
+<div class="nav-right">
+<div class="notify-wrapper">
+    <span id="notify-bell" class="material-icons-outlined">notifications</span>
+    <span id="notify-count" class="badge"></span>
+</div>
+
+  <!-- ⭐ AVATAR + LỜI CHÀO -->
+  <div class="user-info">
+    <span class="material-icons-outlined">account_circle</span>
+    <span class="hello-text" id="greetingText"></span>
+  </div>
+
+<div id="notify-box" class="hidden">
+  <h3>Thông báo</h3>
+  <ul id="notify-list"></ul>
+</div>
+
+
+
+
+
+</header>
+
+
+
+  <!-- ============= CONTENT ============= -->
+  <section class="content">
+
+    <!-- KPI CARDS -->
+    <div class="metrics">
+<div class="metric-item water" id="water_card">
+  <span class="material-icons-outlined">waves</span>
+  <span id="water_text">--</span>
+  <p>Mực nước</p>
+</div>
+
+
+      <div class="metric-item">
+         <span class="material-icons-outlined">health_and_safety</span>
+        <span id="status">--</span>
+        <p>Tình trạng khu vườn</p>
+      </div>
+      <div class="metric-item">
+          <span class="material-icons-outlined">power</span>
+        <span id="device">--</span>
+
+        <p>Thiết bị đang bật</p>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="panel">
+      
+
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Khu vực</th>
+          <th>Loại rau</th>
+          <th>Nhiệt độ</th>
+          <th>Độ ẩm không khí</th>
+          <th>Độ ẩm đất</th>
+          <th>Ánh sáng</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+          <td>Khu 1</td>
+          <td>Cải ngọt</td>
+          <td id="k1_temp">--</td>
+          <td id="k1_humi">--</td>
+          <td id="k1_soil">--</td>
+          <td id="k1_light">--</td>
+        </tr>
+        <tr>
+          <td>Khu 2</td>
+          <td>Cải bó xôi</td>
+          <td id="k2_temp">--</td>
+          <td id="k2_humi">--</td>
+          <td id="k2_soil">--</td>
+          <td id="k2_light">--</td>
+        </tr>
+        <tr>
+          <td>Khu 3</td>
+          <td>Cải xanh</td>
+          <td id="k3_temp">--</td>
+          <td id="k3_humi">--</td>
+          <td id="k3_soil">--</td>
+          <td id="k3_light">--</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="actions">
+      <button class="btn green" id="all_on">Bật hết thiết bị</button>
+      <button class="btn red" id="all_off">Tắt hết thiết bị</button>
+      <button class="btn" id="garden_1">Quản lý vườn 1</button>
+      <button class="btn"  id="garden_2"  >Quản lý vườn 2</button>
+      <button class="btn"    id="garden_3">Quản lý vườn 3</button>
+    </div>
+
+    <footer class="footer">🌿 Ứng Dụng IoT Cho Vườn Rau © 2025</footer>
+
+  </section>
+</div>
+
+
+<!-- ================= FIREBASE GIỮ NGUYÊN ================= -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBGm7yyK1MKP2F17ZBszG68D5ppJTvfCnU",
+  authDomain: "smartgarden-85ec4.firebaseapp.com",
+  databaseURL: "https://smartgarden-85ec4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smartgarden-85ec4",
+  storageBucket: "smartgarden-85ec4.appspot.com",
+  appId: "1:875575541081:web:04a89cced5140c4a5ba048"
+};
+firebase.initializeApp(firebaseConfig);
+</script>
+<!-- JS -->
+<script src="datn.js"></script>
+</body>
+</html>

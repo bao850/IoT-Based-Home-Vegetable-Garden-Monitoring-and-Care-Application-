@@ -1,0 +1,619 @@
+/* ================= GLOBAL ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  font-family: "Segoe UI", sans-serif;
+  background:#eef8ed;
+  color:#222;
+  
+}
+
+
+/***************************************************
+* SIDEBAR
+***************************************************/
+#sidebar{
+  width:260px;
+  height:100vh;
+  background:linear-gradient(180deg,#A5D6A7,#66BB6A);
+  color:#0A1D56;
+  padding:20px 14px;
+  border-radius:0 ;
+  position:fixed;
+  inset:0 auto 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow-y:auto;
+}
+
+/* ===== Tiêu đề sidebar ===== */
+.sidebar-title{
+  font-size:20px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 6px;
+  margin-bottom:16px;
+  color:#0A1D56;
+}
+
+/***************************************************
+* MENU CẤP 1
+***************************************************/
+.sidebar-list{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.sidebar-list-item{
+  border-radius:8px;
+}
+
+/* item cấp 1 */
+.sidebar-list-item > a,
+.dropdown-label{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  font-size:17px;
+  font-weight:600;
+  text-decoration:none;
+  color:#0A1D56;
+  background:transparent;
+  transition:.2s ease;
+  border-radius:8px;
+}
+
+/* Icon sidebar */
+.sidebar .material-icons-outlined{
+  font-size:20px;
+  min-width:22px;
+}
+
+/*icon home*/
+.sidebar-title .material-icons-outlined{
+  transform: translateY(-10px);
+   font-size:30px;
+}
+
+/***************************************************
+* DROPDOWN CLICK — MENU CON GIỮ NGUYÊN
+***************************************************/
+.dropdown{
+  display:flex;
+  flex-direction:column;
+}
+
+/* Input hack click */
+.dropdown input{
+  display:none;
+}
+
+/* submenu */
+.submenu{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding-left:30px;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .25s ease;
+}
+
+/* mở submenu khi checked */
+.dropdown input:checked ~ .submenu{
+  max-height:260px;
+}
+
+/***************************************************
+* Vườn 1 / Vườn 2 / Vườn 3
+***************************************************/
+.submenu a{
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:14px;
+  text-decoration:none;
+  color:#0A1D56;
+  transition:.2s ease;
+}
+
+.submenu a:hover{
+  background:rgba(255,255,255,0.32);
+  transform:translateX(4px);
+}
+/* === HOVER CẤP 1 === */
+.sidebar-list-item > a:hover,
+.dropdown-label:hover {
+  background: rgba(255, 255, 255, 0.20);
+  transform: translateX(4px);
+}
+
+
+/* === HOVER SUBMENU === */
+.submenu a:hover {
+  background: rgba(255,255,255,0.28);
+  transform: translateX(4px);
+}
+
+
+
+
+
+/***************************************************
+* LINK VƯỜN
+***************************************************/
+.submenu a{
+  display:block;
+  padding:8px 10px;
+  font-size:14px;
+  border-radius:8px;
+  color:#3b4654;
+  text-decoration:none;
+  transition:.18s;
+}
+
+.submenu a:hover{
+  background:#e9f3ff;
+  color:#0065c2;
+  transform:translateX(4px);
+}
+
+/* ================= HEADER ================= */
+.header{
+  position:fixed;
+  top:0;
+  left:260px;          /* <== chỉnh theo width sidebar */
+  right:0;
+  height:80px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+ background:  #EFECEC ;
+  border-bottom:1px solid #dcdcdc;
+  z-index:10;
+}
+
+.header-img,
+.header-right{
+  display:none;
+}
+
+.header-text strong{
+  font-size:22px;
+  font-weight:800;
+  color: #0A1D56;
+}
+/* ICON CHUNG */
+.header-icon{
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+}
+
+/* GÓC TRÁI */
+.header-icon-left{
+  position: absolute;
+  left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+/* GÓC PHẢI */
+.header-icon-right{
+  position: absolute;
+  right: 20px;
+  display: flex;
+  align-items: center;
+}
+
+/* ================= MAIN ================= */
+.main-container{
+  margin-left:260px;   /* <== chỉnh theo width sidebar */
+  margin-top:80px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  height:calc(100vh - 80px);
+}
+
+/* ================= 2 panel ================= */
+.content-row{
+  display:flex;
+  gap:14px;
+    height:auto;                /* ✅ BỎ ÉP CAO */
+  align-items:flex-start;    /* ✅ KHÔNG KÉO GIÃN CỘT */
+}
+
+/* ================= LEFT PANEL (VƯỜN) ================= */
+#vuon1{
+  width:38%;
+  background: #ffffff;
+  padding:14px;
+ 
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  overflow:hidden;
+  margin-left: 40px;   /* tăng số này để dịch sang phải nhiều hơn */
+}
+
+.vuon1-title{
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+  color:#176032;
+  margin-bottom:6px;
+}
+
+#gardenImage{
+  
+  object-fit: cover;
+  max-height: 280px;
+  width: 100%;
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+  
+
+}
+
+
+.update-btn{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  
+  border:none;
+  background:#20c997;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.info-text{
+  margin-top:10px;
+  font-size:14px;
+  line-height:1.4;
+}
+
+.garden-mode{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.mode-btn{
+  flex:1;
+  padding:8px;
+  border:none;
+  
+  font-size:14px;
+  font-weight:600;
+   background:#20c997;
+  cursor:pointer;
+   color:#212529;
+}
+
+.mode-btn.active{
+    background:#20c997;
+  color:#fff;
+ box-shadow: 0 0 0 3px rgba(32,201,151,0.35);
+  
+}
+/* ================= THIẾT BỊ ================= */
+/* ================= THIẾT BỊ ================= */
+.device-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  
+   margin-top:5px;
+     width: 100%;          /* 👈 giảm bề ngang tổng thể */
+  margin: 0 auto;     /* 👈 căn giữa */
+         
+}
+
+.device-card{
+  background: linear-gradient(
+    135deg,
+    #FFFDF5,
+    #FFF7D1,
+    #FFEFB0,
+    #FFE4A8
+  );
+ 
+  padding: 15px 10px;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+   
+  
+ 
+}
+
+.device-card img{
+  width: 40px;
+  margin-bottom: 8px;
+}
+
+.device-name{
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  transform: scale(1);   /* tăng 1.4 lần */
+   transform: translate(0px, 10px);
+}
+
+.device-card button{
+  background: transparent;  /* ✅ bỏ nền */
+  border: none;
+  padding: 0;               /* ✅ bỏ khoảng đệm dư */
+  margin: 0;
+  cursor: pointer;
+}
+
+
+.device-card button img{
+  width: 50px;
+ 
+}
+#pump_button{
+  position: relative;
+  
+  left: 4px;
+}
+.device-card > img{
+  transform: scale(1.6);   /* ✅ tăng kích thước icon */
+}
+.icon-wrap {
+  width: 70px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translateX(110px) translateY(-2px); /* ← chỉnh vị trí ở đây */
+}
+
+
+.icon-wrap img {
+  width: 120%;
+  height: 120%;
+
+  display: block;
+  object-fit: contain;
+}
+
+
+
+
+
+.right-col{
+  width:50%;
+
+}
+
+
+
+/* ================= BIỂU ĐỒ ================= */
+.charts{
+  background:#fff;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  
+  /* 🔥 Khối chuẩn */
+  width:100%;
+  height:285px;
+  margin-top: 10px;   /* tăng số này để kéo xuống thêm */
+}
+
+
+
+.chart-title{
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+}
+
+.chart-tabs{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin:8px 0;
+}
+
+.tab-btn{
+  padding:6px 12px;
+  border-radius:999px;
+  border:none;
+  background:#defde7;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.tab-btn:hover{
+  background:#e6fcf5;
+}
+
+.tab-btn.active{
+  background:#20c997;
+  color:#fff;
+}
+
+.chart-box{
+  width:100%;
+  height:100%;
+  background:none;
+
+   height:180px;    /* giảm */
+}
+/* ===== PLANT DETAILS SENSOR PANEL ===== */
+.sensor-panel{
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+/* Header */
+.sensor-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sensor-header strong{
+  font-size: 16px;
+}
+
+.sensor-sub{
+  font-size: 12px;
+  color: black;
+ 
+}
+
+.sensor-arrow{
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* Grid 2x2 */
+.sensor-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Ô nhỏ */
+.sensor-item{
+  background: #f5f6f7;     /* sáng hơn */
+
+  padding: 5px 10px;
+}
+
+/* Bên trái icon + text */
+.sensor-left{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sensor-icon{
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e6f4ea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* Text */
+.sensor-text p{
+  margin: 0;
+  font-size: 13px;
+  color: #444;
+}
+
+.sensor-text span{
+  font-size: 12px;
+  font-weight: 600;
+    color: #8b8b8b;
+}
+.sensor-text{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;                /* gọn như mẫu */
+}
+
+.right-col{
+  margin-left: 40px;   /* tăng lên 30px, 40px nếu muốn xích nhiều hơn */
+}
+
+.charts{
+  margin-top: 10px;
+}
+
+
+.sensor-item p,
+.sensor-item span{
+  text-transform: uppercase;   /* ✅ IN HOA */
+  color: #000000;              /* ✅ MÀU ĐEN */
+  font-weight: 600;            /* đậm nhẹ cho rõ */
+   font-size: 15px;   /* GIÁ TRỊ: 35°C, 70%... */
+    
+}
+
+/* ================= QUẠT ================= */
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spin1 {
+  animation: spinSlow 0.5s linear infinite;
+}
+/* ===== BREEZE – GIÓ NHẸ VƯỜN 2 ===== */
+.breeze {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.leaf {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  background: radial-gradient(circle at 30% 30%,
+  #ffd166,
+  #e85d04,
+  #9d0208
+);
+  border-radius: 0 100% 0 100%;
+  top: -20px;
+  left: calc(100vw * var(--x));
+  animation: leaf-fall linear infinite;
+ 
+
+
+  
+
+
+
+}
+
+/* random vị trí + tốc độ */
+.leaf:nth-child(1) { --x: 0.1; animation-duration: 8s; }
+.leaf:nth-child(2) { --x: 0.3; animation-duration: 10s; }
+.leaf:nth-child(3) { --x: 0.5; animation-duration: 9s; }
+.leaf:nth-child(4) { --x: 0.7; animation-duration: 11s; }
+.leaf:nth-child(5) { --x: 0.9; animation-duration: 12s; }
+
+@keyframes leaf-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
