@@ -11,3 +11,10 @@ The figure shows the front view of the home vegetable garden monitoring and cont
     <br>
   Image 1.2. View through the front glass window of the model.
 </p>
+The figure shows the inside view of the vegetable-growing area of the model. The growing area is divided into three separate zones, with each zone containing soil and young vegetable plants. Each zone is equipped with a drip irrigation pipe to provide water directly to the plants. Cooling fans are installed at the back of the model to improve air circulation and help regulate the temperature. The three zones are separated by partitions, allowing different types of vegetables to be grown and monitored independently.
+<p align="center">
+ <img width="400" alt="image" src="https://github.com/user-attachments/assets/671629be-f546-4620-abc4-280bcd6d639c" />
+    <br>
+  Image 1.3. The pump tubing system on the right side and the misting pump tubing at the back of the model.
+</p>
+The figure shows the pump and misting system installed at the back of the model. The water pump is located on the right side and is connected to several water tubes that supply water to the different growing zones. The misting system is installed above the pump and is connected to the tubing system to spray a fine mist inside the model. These components work together to provide water and maintain suitable humidity for the vegetables.
