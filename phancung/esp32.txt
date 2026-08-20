@@ -1,0 +1,795 @@
+#include <WiFi.h>
+#include <FirebaseESP32.h>
+#include <time.h>
+#include "esp_camera.h"
+
+// ===== CAMERA MODEL =====
+#define TX_PIN 43
+#define RX_PIN 44
+#define CAMERA_MODEL_ESP32S3_CAM_LCD
+#include "camera_pins.h"
+
+// ===== MODULE IMPORT =====
+#include "wifi_module.h"
+#include "firebase_module.h"
+#include "stm32_module.h"
+#include "camera_module.h"
+
+// ==================================================
+// ===============  BIẾN KHỞI TẠO ===================
+// ==================================================
+
+// Firebase
+FirebaseData firebaseData;
+FirebaseAuth auth;
+FirebaseConfig config;
+
+// Time sync
+bool timeReady = false;
+
+// WiFi
+const char* WIFI_SSID     = "Oanh-2";
+const char* WIFI_PASSWORD = "covid21abc";
+
+// Cloudinary
+String CLOUD_NAME      = "djqp5gxru";
+String CLOUD_PRESET    = "garden1";
+String CLOUD_FOLDER    = "garden1";
+
+// Camera capture timer
+unsigned long lastCapture = 0;
+unsigned long captureInterval = 5UL * 60UL * 1000UL; // 5 phút
+
+
+
+int mode1 = 0;
+int mode2 = 0;
+int mode3 = 0;
+
+
+// Vườn 1 trạng thái thiết bị
+int lastBulb  = 0;
+int lastFan   = 0;
+int lastPump  = 0;
+int lastSpray = 0;
+
+// Vườn 2 trạng thái thiết bị
+int lastFan2  = 0;
+int lastPump2 = 0;
+// Vườn 3 trạng thái thiết bị
+int lastFan3  = 0;
+int lastPump3 = 0;
+
+
+int lastMode1 = -1;
+int lastMode2 = -1;
+int lastMode3 = -1;
+
+// Cảnh báo
+bool warnLight = false;
+bool warnHumi  = false;
+bool warnTemp2 = false;
+bool warnSoil2 = false;
+bool warnTemp3 = false;
+bool warnSoil3 = false;
+bool warnTemp1 = false;
+bool warnSoil1 = false;
+
+
+// Firebase PATH
+String base      = "/smart_garden";
+String bulbPath  = base + "/control/vuon1/bulb";
+String fanPath   = base + "/control/vuon1/fan";
+String pumpPath  = base + "/control/vuon1/pump";
+String sprayPath = base + "/control/vuon1/spray";
+
+String lightPath = base + "/sensor/vuon1/light";
+String humiPath  = base + "/sensor/vuon1/humi";
+String tempPath  = base + "/sensor/vuon1/temp";
+String soilPath  = base + "/sensor/vuon1/soil";
+
+String warnList  = base + "/warning/list";
+
+String imagePath = base + "/image/vuon1";
+
+String mode1Path = base + "/mode/vuon1";
+String mode2Path = base + "/mode/vuon2";
+String mode3Path = base + "/mode/vuon3";
+String waterPath = base + "/water_level";
+// ================= NGƯỠNG AUTO =================
+
+// COMMON
+int th_light_min = 500, th_light_max = 800;
+int th_humi_min  = 40,  th_humi_max  = 70;
+
+// VƯỜN 1
+int th_t1_min = 24, th_t1_max = 30;
+int th_s1_min = 40, th_s1_max = 60;
+
+// VƯỜN 2
+int th_t2_min = 26, th_t2_max = 32;
+int th_s2_min = 45, th_s2_max = 65;
+
+// VƯỜN 3
+int th_t3_min = 26, th_t3_max = 34;
+int th_s3_min = 35, th_s3_max = 55;
+
+// ==================================================
+// ================== HÀM HỖ TRỢ =====================
+// ==================================================
+
+// Kiểm tra NTP đã sync hay chưa
+bool isTimeOk(){
+    return time(nullptr) > 1700000000;
+}
+
+
+void loadThresholdFromFirebase() {
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/common/light/min"))
+    th_light_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/common/light/max"))
+    th_light_max = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/common/humi/min"))
+    th_humi_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/common/humi/max"))
+    th_humi_max = firebaseData.intData();
+
+  // ===== VƯỜN 1 =====
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon1/temp/min"))
+    th_t1_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon1/temp/max"))
+    th_t1_max = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon1/soil/min"))
+    th_s1_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon1/soil/max"))
+    th_s1_max = firebaseData.intData();
+
+  // ===== VƯỜN 2 =====
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon2/temp/min"))
+    th_t2_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon2/temp/max"))
+    th_t2_max = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon2/soil/min"))
+    th_s2_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon2/soil/max"))
+    th_s2_max = firebaseData.intData();
+
+  // ===== VƯỜN 3 =====
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon3/temp/min"))
+    th_t3_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon3/temp/max"))
+    th_t3_max = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon3/soil/min"))
+    th_s3_min = firebaseData.intData();
+
+  if (Firebase.getInt(firebaseData, "/smart_garden/setting/vuon3/soil/max"))
+    th_s3_max = firebaseData.intData();
+}
+
+void sendThresholdToSTM32() {
+
+  Serial1.printf("TH_LIGHT:%d,%d\n", th_light_min, th_light_max);
+  Serial1.printf("TH_HUMI:%d,%d\n",  th_humi_min,  th_humi_max);
+
+  Serial1.printf("TH_T1:%d,%d\n", th_t1_min, th_t1_max);
+  Serial1.printf("TH_S1:%d,%d\n", th_s1_min, th_s1_max);
+
+  Serial1.printf("TH_T2:%d,%d\n", th_t2_min, th_t2_max);
+  Serial1.printf("TH_S2:%d,%d\n", th_s2_min, th_s2_max);
+
+  Serial1.printf("TH_T3:%d,%d\n", th_t3_min, th_t3_max);
+  Serial1.printf("TH_S3:%d,%d\n", th_s3_min, th_s3_max);
+}
+
+// ==================================================
+// ======================== SETUP ====================
+// ==================================================
+
+void setup(){
+
+    Serial.begin(115200);
+    Serial1.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);  // UART tới STM32
+    Serial1.setTimeout(50);
+
+
+    // ===== WIFI =====
+    initWiFi(WIFI_SSID, WIFI_PASSWORD);
+
+    // ===== CAMERA =====
+    if(!initCameraModule()){
+        Serial.println("CAMERA FAIL");
+        while(1) delay(1000);
+    }
+    // ===== START STREAM =====
+//startCameraStream();
+
+
+    // ===== FIREBASE =====
+    config.host = "smartgarden-85ec4-default-rtdb.asia-southeast1.firebasedatabase.app";
+    config.signer.tokens.legacy_token = "nJHUyfkUaKHdgZNZONKRs1RDgCxKrDnNMDcyYAbq";
+    initFirebase(&config, &auth);
+
+
+    // ===== STM32 UART INIT =====
+    initSTM32(RX_PIN, TX_PIN);
+    delay(500);          // ⭐ BẮT BUỘC
+    loadThresholdFromFirebase();
+delay(200);
+sendThresholdToSTM32();
+
+    // ===== TIME NTP =====
+    configTime(7*3600, 0, "pool.ntp.org", "time.google.com");
+    while(!isTimeOk()) delay(300);
+    timeReady = true;
+
+    // ===== LOAD MODE =====
+if (Firebase.getInt(firebaseData, mode1Path)) mode1 = firebaseData.intData();
+if (Firebase.getInt(firebaseData, mode2Path)) mode2 = firebaseData.intData();
+if (Firebase.getInt(firebaseData, mode3Path)) mode3 = firebaseData.intData();
+
+lastMode1 = mode1;
+lastMode2 = mode2;
+lastMode3 = mode3;
+
+// gửi mode cho STM32
+Serial1.println(mode1 ? "MODE1_AUTO" : "MODE1_MANUAL");
+Serial1.println(mode2 ? "MODE2_AUTO" : "MODE2_MANUAL");
+Serial1.println(mode3 ? "MODE3_AUTO" : "MODE3_MANUAL");
+
+requestState();
+// ⭐ THÊM ĐOẠN NÀY ⭐
+delay(500);   // chờ STM32 init xong UART
+Serial1.println(mode1 ? "MODE1_AUTO" : "MODE1_MANUAL");
+Serial1.println(mode2 ? "MODE2_AUTO" : "MODE2_MANUAL");
+Serial1.println(mode3 ? "MODE3_AUTO" : "MODE3_MANUAL");
+
+
+    // ===== LOAD TRẠNG THÁI THIẾT BỊ VƯỜN 1 =====
+    Firebase.getInt(firebaseData, bulbPath)  ? lastBulb  = firebaseData.intData() : 0;
+    Firebase.getInt(firebaseData, fanPath)   ? lastFan   = firebaseData.intData() : 0;
+    Firebase.getInt(firebaseData, pumpPath)  ? lastPump  = firebaseData.intData() : 0;
+    Firebase.getInt(firebaseData, sprayPath) ? lastSpray = firebaseData.intData() : 0;
+}
+
+
+
+// ==================================================
+// ======================== LOOP =====================
+// ==================================================
+
+void loop(){
+
+    ensureWiFi();
+    if(WiFi.status()!=WL_CONNECTED) return;
+
+    // ==================================================
+    // ============== KIỂM TRA MODE TỪ FIREBASE ==========
+    // ==================================================
+    // ==================================================
+// ============== KIỂM TRA MODE TỪ FIREBASE ==========
+// ==================================================
+if (Firebase.getInt(firebaseData, mode1Path)) {
+  mode1 = firebaseData.intData();
+  if (mode1 != lastMode1) {
+    Serial1.println(mode1 ? "MODE1_AUTO" : "MODE1_MANUAL");
+       Serial1.println("REQUEST_STATE");   // ⭐ thêm dòng này
+    lastMode1 = mode1;
+  }
+}
+
+if (Firebase.getInt(firebaseData, mode2Path)) {
+  mode2 = firebaseData.intData();
+  if (mode2 != lastMode2) {
+    Serial1.println(mode2 ? "MODE2_AUTO" : "MODE2_MANUAL");
+       Serial1.println("REQUEST_STATE");   // ⭐ thêm dòng này
+    lastMode2 = mode2;
+  }
+}
+
+if (Firebase.getInt(firebaseData, mode3Path)) {
+  mode3 = firebaseData.intData();
+  if (mode3 != lastMode3) {
+    Serial1.println(mode3 ? "MODE3_AUTO" : "MODE3_MANUAL");
+       Serial1.println("REQUEST_STATE");   // ⭐ thêm dòng này
+    lastMode3 = mode3;
+  }
+}
+
+
+
+    // ==================================================
+    // =========== XỬ LÝ MANUAL CHO 2 VƯỜN ==============
+    // ==================================================
+   // ==================================================
+// =========== XỬ LÝ MANUAL RIÊNG TỪNG VƯỜN ==========
+// ==================================================
+
+static unsigned long t = 0;
+if (millis() - t > 1500) {
+  t = millis();
+  int v;
+
+  // ================== VƯỜN 1 ==================
+  if (mode1 == 0) {   // MANUAL VƯỜN 1
+
+    if (Firebase.getInt(firebaseData, bulbPath)) {
+      v = firebaseData.intData();
+      if (v != lastBulb) {
+        lastBulb = v;
+        sendBulb(v);
+      }
+    }
+
+    if (Firebase.getInt(firebaseData, fanPath)) {
+      v = firebaseData.intData();
+      if (v != lastFan) {
+        lastFan = v;
+        sendFan(v);
+      }
+    }
+
+    if (Firebase.getInt(firebaseData, pumpPath)) {
+      v = firebaseData.intData();
+      if (v != lastPump) {
+        lastPump = v;
+        sendPump(v);
+      }
+    }
+
+    if (Firebase.getInt(firebaseData, sprayPath)) {
+      v = firebaseData.intData();
+      if (v != lastSpray) {
+        lastSpray = v;
+        sendSpray(v);
+      }
+    }
+  }
+
+  // ================== VƯỜN 2 ==================
+  if (mode2 == 0) {   // MANUAL VƯỜN 2
+
+    if (Firebase.getInt(firebaseData, "/smart_garden/control/vuon2/fan")) {
+      v = firebaseData.intData();
+      if (v != lastFan2) {
+        lastFan2 = v;
+        Serial1.println(v == 1 ? "FAN2_ON" : "FAN2_OFF");
+      }
+    }
+
+    if (Firebase.getInt(firebaseData, "/smart_garden/control/vuon2/pump")) {
+      v = firebaseData.intData();
+      if (v != lastPump2) {
+        lastPump2 = v;
+        Serial1.println(v == 1 ? "PUMP2_ON" : "PUMP2_OFF");
+      }
+    }
+  }
+
+  // ================== VƯỜN 3 ==================
+  if (mode3 == 0) {   // MANUAL VƯỜN 3
+
+    if (Firebase.getInt(firebaseData, "/smart_garden/control/vuon3/fan")) {
+      v = firebaseData.intData();
+      if (v != lastFan3) {
+        lastFan3 = v;
+        Serial1.println(v == 1 ? "FAN3_ON" : "FAN3_OFF");
+      }
+    }
+
+    if (Firebase.getInt(firebaseData, "/smart_garden/control/vuon3/pump")) {
+      v = firebaseData.intData();
+      if (v != lastPump3) {
+       lastPump3 = v;
+        Serial1.println(v == 1 ? "PUMP3_ON" : "PUMP3_OFF");
+      }
+    }
+  }
+}
+
+
+
+
+    // ==================================================
+    // ======== NHẬN DATA UART TỪ STM32 (SENSOR) ========
+    // ==================================================
+
+    while(Serial1.available()){
+
+        String msg = Serial1.readStringUntil('\n');
+        msg.trim();
+        if(msg=="") continue;
+
+// ===== VƯỜN 1 =====
+if (mode1 == 0 && msg.startsWith("FAN_STATE:")) {
+  lastFan = -1;
+}
+if (mode1 == 0 && msg.startsWith("PUMP_STATE:")) {
+  lastPump = -1;
+}
+
+// ===== VƯỜN 2 =====
+if (mode2 == 0 && msg.startsWith("FAN2_STATE:")) {
+  lastFan2 = -1;
+}
+if (mode2 == 0 && msg.startsWith("PUMP2_STATE:")) {
+  lastPump2 = -1;
+}
+
+// ===== VƯỜN 3 =====
+if (mode3 == 0 && msg.startsWith("FAN3_STATE:")) {
+  lastFan3 = -1;
+}
+if (mode3 == 0 && msg.startsWith("PUMP3_STATE:")) {
+  lastPump3 = -1;
+}
+
+
+
+
+
+        // STM32 yêu cầu ESP gửi lại trạng thái
+if(msg=="REQUEST_STATE"){
+
+  // GỬI MODE HIỆN TẠI (BẮT BUỘC)
+  Serial1.println(mode1 ? "MODE1_AUTO" : "MODE1_MANUAL");
+  Serial1.println(mode2 ? "MODE2_AUTO" : "MODE2_MANUAL");
+  Serial1.println(mode3 ? "MODE3_AUTO" : "MODE3_MANUAL");
+
+  // GỬI TRẠNG THÁI THIẾT BỊ
+  sendBulb(lastBulb);
+  sendFan(lastFan);
+  sendPump(lastPump);
+  sendSpray(lastSpray);
+   sendFan2(lastFan2);
+  sendPump2(lastPump2);
+   sendFan3(lastFan3);
+  sendPump3(lastPump3);
+  continue;
+}
+// ===== CẢNH BÁO TOÀN KHU =====
+if(msg == "WARN_LIGHT:1" && !warnLight){
+  warnLight = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "system", "light",
+    0,
+    "Ánh sáng yếu – cần bật đèn",
+    time(nullptr)
+  );
+  continue;
+}
+
+if(msg == "WARN_LIGHT:0"){
+  warnLight = false;
+  continue;
+}
+
+if(msg == "WARN_HUMI:1" && !warnHumi){
+  warnHumi = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "system", "humi",
+    0,
+    "Không khí khô – cần bật phun sương",
+    time(nullptr)
+  );
+  continue;
+}
+
+if(msg == "WARN_HUMI:0"){
+  warnHumi = false;
+  continue;
+}
+
+// ===== VƯỜN 1 =====
+if(msg == "WARN_TEMP1:1" && !warnTemp1){
+  warnTemp1 = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "vuon1", "temp",
+    0,
+    "Nhiệt độ cao – cần bật quạt",
+    time(nullptr)
+  );
+}
+
+if(msg == "WARN_TEMP1:0"){
+  warnTemp1 = false;
+}
+
+if(msg == "WARN_SOIL1:1" && !warnSoil1){
+  warnSoil1 = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "vuon1", "soil",
+    0,
+    "Đất khô – cần tưới",
+    time(nullptr)
+  );
+}
+
+if(msg == "WARN_SOIL1:0"){
+  warnSoil1 = false;
+}
+
+// ===== VƯỜN 2 =====
+if(msg == "WARN_TEMP2:1" && !warnTemp2){
+  warnTemp2 = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "vuon2", "temp",
+    0,
+    "Nhiệt độ cao – cần bật quạt",
+    time(nullptr)
+  );
+}
+
+if(msg == "WARN_TEMP2:0"){
+  warnTemp2 = false;
+}
+
+if(msg == "WARN_SOIL2:1" && !warnSoil2){
+  warnSoil2 = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "vuon2", "soil",
+    0,
+    "Đất khô – cần tưới",
+    time(nullptr)
+  );
+}
+
+if(msg == "WARN_SOIL2:0"){
+  warnSoil2 = false;
+}
+
+// ===== VƯỜN 3 =====
+if(msg == "WARN_TEMP3:1" && !warnTemp3){
+  warnTemp3 = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "vuon3", "temp",
+    0,
+    "Nhiệt độ cao – cần bật quạt",
+    time(nullptr)
+  );
+}
+
+if(msg == "WARN_TEMP3:0"){
+  warnTemp3 = false;
+}
+
+if(msg == "WARN_SOIL3:1" && !warnSoil3){
+  warnSoil3 = true;
+  fbPushWarning(
+    &firebaseData,
+    warnList,
+    "vuon3", "soil",
+    0,
+    "Đất khô – cần tưới",
+    time(nullptr)
+  );
+}
+
+if(msg == "WARN_SOIL3:0"){
+  warnSoil3 = false;
+}
+
+
+
+
+
+
+
+
+        // ==================================================
+        // ================== SENSOR VƯỜN 1 ==================
+        // ==================================================
+
+        if(msg.startsWith("LIGHT:")){
+    int v = msg.substring(6).toInt();
+    fbSetInt(&firebaseData, lightPath + "/live", v);
+    continue;
+}
+
+if(msg.startsWith("TEMP:")){
+    float v = msg.substring(5).toFloat();
+    fbSetFloat(&firebaseData, tempPath + "/live", v);
+    continue;
+}
+
+if(msg.startsWith("HUMID:")){
+    float v = msg.substring(6).toFloat();
+    fbSetFloat(&firebaseData, humiPath + "/live", v);
+    continue;
+}
+
+if(msg.startsWith("SOIL:")){
+    float v = msg.substring(5).toFloat();
+    fbSetFloat(&firebaseData, soilPath + "/live", v);
+    continue;
+}
+
+
+
+        // ==================================================
+        // ================== SENSOR VƯỜN 2 ==================
+        // ==================================================
+
+        if(msg.startsWith("SOIL2:")){
+            float v = msg.substring(6).toFloat();
+            fbSetFloat(&firebaseData, "/smart_garden/sensor/vuon2/soil/live", v);
+
+            
+
+            continue;
+        }
+// ================== SENSOR VƯỜN 3 ==================
+if(msg.startsWith("SOIL3:")){
+    float v = msg.substring(6).toFloat();
+    fbSetFloat(&firebaseData, "/smart_garden/sensor/vuon3/soil/live", v);
+
+
+}
+
+
+        // ==================================================
+        // ========== TRẠNG THÁI THIẾT BỊ VƯỜN 1 =============
+        // ==================================================
+        if(msg.startsWith("BULB_STATE:")){
+            int st = msg.substring(11).toInt();
+            lastBulb = st;
+            fbSetInt(&firebaseData, bulbPath, st);
+            continue;
+        }
+
+        if(msg.startsWith("FAN_STATE:")){
+            int st = msg.substring(10).toInt();
+            lastFan = st;
+            fbSetInt(&firebaseData, fanPath, st);
+            continue;
+        }
+
+        if(msg.startsWith("PUMP_STATE:")){
+            int st = msg.substring(11).toInt();
+            lastPump = st;
+            fbSetInt(&firebaseData, pumpPath, st);
+            continue;
+        }
+
+        if(msg.startsWith("SPRAY_STATE:")){
+            int st = msg.substring(12).toInt();
+            lastSpray = st;
+            fbSetInt(&firebaseData, sprayPath, st);
+            continue;
+        }
+    
+if(msg.startsWith("FAN2_STATE:")){
+    int st = msg.substring(11).toInt();
+    lastFan2 = st;
+    fbSetInt(&firebaseData,
+        "/smart_garden/control/vuon2/fan",
+        st
+    );
+    continue;
+}
+
+if(msg.startsWith("PUMP2_STATE:")){
+    int st = msg.substring(12).toInt();
+    lastPump2 = st;
+    fbSetInt(&firebaseData,
+        "/smart_garden/control/vuon2/pump",
+        st
+    );
+    continue;
+}
+
+if(msg.startsWith("FAN3_STATE:")){
+    int st = msg.substring(11).toInt();
+    lastFan3 = st;
+    fbSetInt(&firebaseData,
+        "/smart_garden/control/vuon3/fan",
+        st
+    );
+    continue;
+}
+if(msg.startsWith("PUMP3_STATE:")){
+    int st = msg.substring(12).toInt();
+    lastPump3 = st;
+    fbSetInt(&firebaseData,
+        "/smart_garden/control/vuon3/pump",
+        st
+    );
+    continue;
+}
+ if (msg.startsWith("WATER:")) Firebase.setInt(firebaseData, waterPath + "/live", msg.substring(6).toInt());
+
+}
+
+
+
+
+
+
+
+
+    // ==================================================
+    // ====== FIREBASE YÊU CẦU CHỤP ẢNH TỪ WEB ==========
+    // ==================================================
+
+    static unsigned long lastCheck = 0;
+    if(millis() - lastCheck > 1500){
+        lastCheck = millis();
+
+        // VƯỜN 1
+        if(Firebase.getFloat(firebaseData, "/smart_garden/camera/capture")){
+            if(firebaseData.floatData() > 0.5){
+                String url = captureImageThenUpload(CLOUD_NAME, CLOUD_PRESET, "garden1");
+                if(url!="") Firebase.setString(firebaseData, "/smart_garden/image/vuon1", url);
+                fbSetInt(&firebaseData, "/smart_garden/camera/capture", 0);
+            }
+        }
+
+        // VƯỜN 2
+        if(Firebase.getFloat(firebaseData, "/smart_garden/camera/capture2")){
+            if(firebaseData.floatData() > 0.5){
+                String url = captureImageThenUpload(CLOUD_NAME, CLOUD_PRESET, "garden2");
+                if(url!="") Firebase.setString(firebaseData, "/smart_garden/image/vuon2", url);
+                fbSetInt(&firebaseData, "/smart_garden/camera/capture2", 0);
+            }
+        }
+
+        // VƯỜN 3
+        if(Firebase.getFloat(firebaseData, "/smart_garden/camera/capture3")){
+            if(firebaseData.floatData() > 0.5){
+                String url = captureImageThenUpload(CLOUD_NAME, CLOUD_PRESET, "garden3");
+                if(url!="") Firebase.setString(firebaseData, "/smart_garden/image/vuon3", url);
+                fbSetInt(&firebaseData, "/smart_garden/camera/capture3", 0);
+            }
+            
+
+    }
+
+}
+// ================= UPDATE NGƯỠNG REALTIME =================
+if (Firebase.getInt(firebaseData, "/smart_garden/setting/update")) {
+  if (firebaseData.intData() == 1) {
+
+    Serial.println("⚡ Threshold updated!");
+
+    loadThresholdFromFirebase();   // đọc ngưỡng mới
+    sendThresholdToSTM32();        // gửi cho STM32
+
+    // reset cờ
+    Firebase.setInt(firebaseData,
+      "/smart_garden/setting/update", 0);
+  }
+}
+
+static unsigned long lastLoadTh = 0;
+if (millis() - lastLoadTh > 30000) {   // 30 giây
+  lastLoadTh = millis();
+  loadThresholdFromFirebase();
+  sendThresholdToSTM32();
+}
+
+}
