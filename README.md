@@ -52,3 +52,10 @@ Figure 1.8 illustrates the system’s device control interface on the web platfo
   Image 1.9. Image library for storing vegetable garden images on Cloudinary.
 </p>
 Figure 1.9 illustrates the image library management interface of the system on the Cloudinary platform. Here, images captured by the camera are stored and categorized according to each vegetable growing zone. After being cropped appropriately for each zone, the images are synchronized with the Firebase database and displayed on the web interface, allowing users to monitor and track the condition of the vegetable garden over time.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/7ef68cc7-7fbc-45b5-b695-0c3e469fb0f4" />
+    <br>
+  Image 1.10. Vegetable garden images after being cropped and synchronized with the web interface.
+</p>
+Figure 1.10 illustrates the web interface displaying images of the vegetable garden after being cropped by the system according to each growing zone. The images captured by the camera are initially separated into appropriate sections for each garden zone and then synchronized with the web interface, allowing users to clearly and visually monitor the condition of each vegetable growing zone.
+
