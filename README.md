@@ -74,3 +74,49 @@ Figure 1.12 illustrates the home page interface of the vegetable garden manageme
 At the top of the interface, the system displays a notification bell icon used to send and display alerts when an abnormal condition is detected in the vegetable garden or its devices. These alerts help users promptly identify the system status and take appropriate actions.
 
 The central content area provides an overview of the system’s operating status, including the water level in the tank, garden condition, number of active devices, and environmental parameters of each vegetable growing zone, such as temperature, air humidity, soil moisture, and light intensity. Through this interface, users can easily monitor, compare, and manage the operation of the entire vegetable garden system.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/80eff7d0-8604-41cd-9ac2-961e2ffcf912" />
+    <br>
+  Image 1.13. Vegetable Garden Alert Interface
+</p>
+Figure 1.13 illustrates the alert interface of the vegetable garden monitoring system on the web platform. When environmental parameters exceed the predefined safety thresholds, the system automatically generates an alert and displays it in the Notifications section of the user interface.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/292d5097-134c-4284-9364-f0322d468998" />
+    <br>
+  Image 1.14. Garden 1 Interface
+</p>
+Figure 1.14 illustrates the management interface for Garden 1 of the system. The upper section of the interface displays general environmental parameters, including temperature, air humidity, soil moisture, and light intensity, allowing users to quickly assess the environmental conditions at the time of observation.
+
+The central section displays an image of the garden captured by the camera, processed by cropping, and synchronized with the web interface, supporting visual monitoring of the plants. Next to the image is the device control section, which allows users to turn devices such as lighting, ventilation fans, the water pump, and the misting system on or off. The system supports both manual and automatic modes. At the bottom, the environmental charts show the variation of environmental parameters over time, helping users monitor trends and evaluate the growth of the vegetable garden.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/87228d41-868b-4783-b8b7-1f74296437e1" />
+    <br>
+  Image 1.15. Garden 2 Interface
+</p>
+<p align="center">
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/42769c6e-eb30-49b7-9fd6-816254456cb4" />
+    <br>
+  Image 1.16. Garden 3 Interface
+</p>
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/babaa2af-b527-4d2f-a03e-ad8ea508c11e" />
+    <br>
+  Image 1.17. Vegetable Growing Guide Interface
+</p>
+Figure 1.17 illustrates the plant-growing guide interface of the vegetable garden management system. This interface provides detailed instructions for planting and caring for plants, clearly presenting each stage, such as seed sowing, initial care, and important considerations during cultivation. The instructions are presented in the form of text combined with illustrative images, making it easy for users to follow and properly carry out the planting process.
+
+In addition, the interface includes a threshold settings section for environmental parameters such as temperature, soil moisture, air humidity, and light intensity for each garden zone. Setting these thresholds allows the system to operate automatically according to the requirements of each type of vegetable, while also helping users control and adjust environmental conditions to improve the growth of the vegetable garden.
+<p align="center">
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/ca78f8a9-cc86-4609-b5ae-4b66cba11d8f" />
+    <br>
+  Image 1.18. Planting History Interface
+</p>
+Figure 1.18 illustrates the Vegetable Garden Growth History interface of the system. This interface is used to store and display the development of the plants at different points in time. At each stage, the system displays images of the vegetable garden captured by the camera, along with information about the growing zone and the corresponding type of vegetable.
+
+In addition to the images, the interface provides comments and assessments of the plants’ growth conditions at each time point, allowing users to track changes in the vegetable garden from the seed-sowing stage until germination and subsequent growth. Storing growth history not only supports visual monitoring but also helps users evaluate the effectiveness of the care process and environmental conditions over time.
+<p align="center">
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/cdf188b4-c7db-40b3-93ea-cc6f82ea3fbd" />
+    <br>
+  Image 1.19. Firebase Data Storage Structure
+</p>
+Figure 1.19 illustrates the database structure of the system on the Firebase Realtime Database platform. The sensor data, device control states, vegetable garden images, and image processing history are stored and managed according to functional groups. Organizing the data in a hierarchical structure allows the system to easily retrieve, update, and display information on the web interface while meeting the data storage requirements during system operation.
